@@ -8,6 +8,7 @@ import com.group.libraryapp.domain.user.loanhistory.UserLoanHistory;
 import com.group.libraryapp.domain.user.loanhistory.UserLoanHistoryRepository;
 import com.group.libraryapp.dto.book.request.BookCreateRequest;
 import com.group.libraryapp.dto.book.request.BookLoanRequest;
+import com.group.libraryapp.dto.book.request.BookReturnRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,7 +20,7 @@ public class BookService {
     private final UserLoanHistoryRepository userLoanHistoryRepository;
     private final UserRepository userRepository;
 
-    public BookService (BookRepository bookRepository,
+    public BookService(BookRepository bookRepository,
                        UserLoanHistoryRepository userLoanHistoryRepository,
                        UserRepository userRepository
     ) {
@@ -44,7 +45,14 @@ public class BookService {
 
         User user = userRepository.findByName(request.getUserName())
                 .orElseThrow(IllegalArgumentException::new);
+        user.loanBook(book.getName());
+    }
 
-        userLoanHistoryRepository.save(new UserLoanHistory(user.getId(), book.getName()));
+    @Transactional
+    public void returnBook(BookReturnRequest request) {
+        User user = userRepository.findByName(request.getUserName())
+                .orElseThrow(IllegalArgumentException::new);
+
+        user.returnBook(request.getBookName());
     }
 }
